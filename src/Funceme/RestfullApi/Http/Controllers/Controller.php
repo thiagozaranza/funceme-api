@@ -12,8 +12,8 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-use App\Http\Requests\RestHttpRequest;
-use App\DataTransferObjects\DataObjectDTO;
+use Funceme\RestfullApi\Http\Requests\RestHttpRequest;
+use Funceme\RestfullApi\DTOs\DataObjectDTO;
 
 class Controller extends BaseController
 {
