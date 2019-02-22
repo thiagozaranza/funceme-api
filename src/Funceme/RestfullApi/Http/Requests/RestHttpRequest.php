@@ -28,7 +28,13 @@ class RestHttpRequest extends Request
 
         $meta_request = new MetaRequestDTO;
 
-        $meta_request->setURN($this->request->get('q'));
+        $urn = '';
+        if (method_exists($this->request, 'getPathInfo'))
+            $urn = $this->request->getPathInfo();
+        else     
+            $urn = $this->request->get('q');
+
+        $meta_request->setURN($urn);
         $meta_request->setAction($action);
         $meta_request->setModel(get_class(modelFactory($this->controller)));
         $meta_request->setQueryParams($this->parseQueryParams());

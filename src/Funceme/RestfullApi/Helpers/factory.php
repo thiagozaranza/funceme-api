@@ -121,7 +121,7 @@ if (!function_exists('getSchemaName')) {
     function getSchemaName($context) : string
     {
         $parts = explode('\\', get_class($context));
-        return $parts[sizeof($parts) - 2];
+        return (sizeof($parts) == 6)? $parts[sizeof($parts) - 2] . '\\' : '';
     }
 }
 
@@ -132,7 +132,7 @@ if (!function_exists('modelFactory')) {
      **/
     function modelFactory($context)
     {
-        $class_name = 'App\\Models\\' . getSchemaName($context) . '\\' . getModelClassName($context);
+        $class_name = 'App\\Models\\' . getSchemaName($context) . getModelClassName($context);
 
         if (class_exists($class_name))
             return new $class_name;
@@ -146,7 +146,8 @@ if (!function_exists('repositoryFactory')) {
      **/
     function repositoryFactory($context)
     {
-        $class_name = 'App\\Repositories\\' . getSchemaName($context) . '\\' . getModelClassName($context) . 'Repository';
+        $class_name = 'App\\Repositories\\' . getSchemaName($context) . getModelClassName($context) . 'Repository';
+
         if (class_exists($class_name))
             return new $class_name;
     }
@@ -159,7 +160,8 @@ if (!function_exists('serviceFactory')) {
      **/
     function serviceFactory($context)
     {
-        $class_name = 'App\\Services\\Rest\\' . getSchemaName($context) . '\\' . getModelClassName($context) . 'Service';
+        $class_name = 'App\\Services\\Rest\\' . getSchemaName($context) . getModelClassName($context) . 'Service';
+
         if (class_exists($class_name))
             return new $class_name;
     }

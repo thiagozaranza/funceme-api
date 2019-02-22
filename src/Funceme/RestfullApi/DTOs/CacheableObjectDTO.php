@@ -103,7 +103,7 @@ class CacheableObjectDTO
 
     private function cleanObject($object)
     {
-        if (!$object instanceof Model)
+        if (!$object instanceof Model || !property_exists($object, 'maps'))
             return $object;
 
         $properties = array_values($object->maps);

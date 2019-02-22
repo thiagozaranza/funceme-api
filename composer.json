@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
         "spatie/laravel-permission": "^2.23",
-        "sofa/eloquence": "5.5.*"
+        "sofa/eloquence": "5.5.*",
+        "predis/predis": "^1.1"
     },
     "license": "MIT",
     "authors": [
