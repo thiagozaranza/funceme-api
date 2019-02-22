@@ -1,0 +1,22 @@
+{
+    "name": "funceme/restfull-api",
+    "description": "Api restfull com implementação de authentication, authorization e cache",
+    "type": "library",
+    "require": {
+        "spatie/laravel-permission": "^2.23",
+        "sofa/eloquence": "5.5.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thiago Zaranza",
+            "email": "thiagozaranza@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Funceme\\RestfullApi\\": "src/"
+        }
+    }
+}
