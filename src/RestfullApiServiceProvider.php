@@ -13,6 +13,8 @@ class RestfullApiServiceProvider extends ServiceProvider {
         
     public function register()    
     {
-    
+        $this->commands([
+            Funceme\RestfullApi\Commands\CreateEntityCommand::class
+        ]);
     }
 }
