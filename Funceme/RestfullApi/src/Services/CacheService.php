@@ -60,12 +60,6 @@ class CacheService
     {
         $cached_object = null;
 
-        //Redis::connection()->client()->pipeline()->get();
-       
-
-        dd(Redis::connection()->client()->getOptions()->defined());
-        dd(get_class_methods(Redis::connection()->client()->getOptions()));
-
         /*if (!Redis::connection()->client()->isConnected()) {
             Log::warning('Redis is not connected!');
             return null;
