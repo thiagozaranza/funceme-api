@@ -58,13 +58,14 @@ trait PaginationTrait
 
                 if ($relation_type == "Illuminate\Database\Eloquent\Relations\BelongsTo") {
 
-                    if (array_key_exists($filter_part, array_flip($_model->maps)))
+                    if (property_exists($_model, 'maps') && array_key_exists($filter_part, array_flip($_model->maps)))
                         $filter_part_fk = array_flip($_model->maps)[$filter_part];
                     else
-                        $filter_part_fk = $filter_part;
+                        $filter_part_fk = $filter_part . '_id';
 
                     $_model = $_model->$filter_part()->getModel();
                     $_table = $_model->getTable();
+                    $_primaryKey = ($_model->primaryKey)? $_model->primaryKey : 'id'; 
 
                     $joins = $query->getQuery()->joins;
 
@@ -78,14 +79,17 @@ trait PaginationTrait
                     }
 
                     if (!$isJoined)
-                        $query->join($_table, $filter_part_fk, '=', $_table . '.' . $_model->primaryKey);
+                        $query->join($_table, $filter_part_fk, '=', $_table . '.' . $_primaryKey);
 
                     if (sizeof($key_parts) == 1) {
-                        if (array_key_exists($key_parts[0], array_flip($_model->maps))) {
+                        if (property_exists($_model, 'maps') && array_key_exists($key_parts[0], array_flip($_model->maps))) {
                             $_field = array_flip($_model->maps)[$key_parts[0]];
-                        }
+                        } else {
+                            $_field = $key_parts[0];
+                        } 
+
                     } else {
-                        $_field = $_model->primaryKey;
+                        $_field = $_primaryKey;
                     }
 
                 } elseif ($_type == 'Illuminate\Database\Eloquent\Relations\BelongsToMany') {
@@ -163,34 +167,43 @@ trait PaginationTrait
 
                 $eager_model = $main_model->$eager_model_name()->getRelated();
 
-                $fliped_map_keys = array_flip($eager_model->maps);
+                $primaryKey = ($eager_model->primaryKey)? $eager_model->primaryKey : 'id';
+
+                $fliped_map_keys = (property_exists($eager_model, 'maps'))? array_flip($eager_model->maps) : [];
 
                 if (sizeof($_withParts) > 0) {
 
                     $_keys = [];
 
                     foreach (explode(';', $_withParts[0]) as $_key_part) {
-                        $_keys[] = $fliped_map_keys[$_key_part];
+                        if (property_exists($eager_model, 'maps'))
+                            $_keys[] = $fliped_map_keys[$_key_part];
+                        else 
+                            $_keys[] = $_key_part;
                     }
 
-                    if (array_key_exists('nome', $fliped_map_keys)) {
-                        $name_key = $fliped_map_keys['nome'];
-                        if (!array_key_exists($name_key, $_keys))
-                            $_keys[] = $name_key;
+                    if (property_exists($eager_model, 'maps')) {
+                        if (array_key_exists('nome', $fliped_map_keys)) {
+                            $name_key = $fliped_map_keys['nome'];
+                            if (!array_key_exists($name_key, $_keys))
+                                $_keys[] = $name_key;
+                        }
+                    } else {
+                        $_keys[] = 'nome';
                     }
 
-                    $_with = $eager_model_name . ':' . $eager_model->primaryKey . ',' . implode(',', $_keys);    
+                    $_with = $eager_model_name . ':' . $primaryKey . ',' . implode(',', $_keys);  
                 } else {
                     
                     $name_key = '';
                     if (array_key_exists('nome', $fliped_map_keys))
                         $name_key =  ',' . $fliped_map_keys['nome'];
+                    else 
+                        $name_key =  ',nome';
 
-                    $_with = $eager_model_name . ':' . $eager_model->primaryKey . $name_key;
+                    $_with = $eager_model_name . ':' . $primaryKey . $name_key;
                 }
             }
-
-            // /dd($_with);
 
             $query->with($_with);
         }
@@ -208,6 +221,7 @@ trait PaginationTrait
     public function paginate(QueryParamsDTO $paginator): Collection
     {
         $query = (new static)->newQuery();
+        $model = $query->getModel();
 
         $this->buildQuery($query, $paginator);
 
@@ -222,9 +236,8 @@ trait PaginationTrait
             $field = $orderParts[0];
             $mode = (sizeof($orderParts) > 1)? $orderParts[1] : 'asc';
 
-            if (array_key_exists($field, array_flip($query->getModel()->maps))) {
-                $field = array_flip($query->getModel()->maps)[$field];
-            }
+            if (property_exists($model, 'maps') && array_key_exists($field, array_flip($model->maps))) 
+                $field = array_flip($model->maps)[$field];
 
             $query->orderBy($field, $mode);
         }
