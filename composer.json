@@ -15,6 +15,9 @@
     ],
     "minimum-stability": "stable",
     "autoload": {
+        "files": [
+            "src/Funceme/RestfullApi/Helpers/factory.php"
+        ],
         "psr-4": {
             "Funceme\\RestfullApi\\": "src/"
         }
