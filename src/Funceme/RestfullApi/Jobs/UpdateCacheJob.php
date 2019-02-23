@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
-use Funceme\Repositories\BaseRepository;
-use Funceme\DTOs\CacheableObjectDTO;
-use Funceme\DTOs\CacheOptionsDTO;
-use Funceme\Services\PaginationService;
+use Funceme\RestfullApi\Repositories\BaseRepository;
+use Funceme\RestfullApi\DTOs\CacheableObjectDTO;
+use Funceme\RestfullApi\DTOs\CacheOptionsDTO;
+use Funceme\RestfullApi\Services\PaginationService;
 
 class UpdateCacheJob implements ShouldQueue
 {
