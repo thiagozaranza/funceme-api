@@ -85,12 +85,9 @@ abstract class BaseRepository
     *
     *
     */
-    public function store($request)
+    public function store($obj)
     {
-        $obj = new $this->modelClass;
-
-        $obj->fill($request->toArray());
-        $obj->created_by = Auth::user()->id;
+        //$obj->created_by = Auth::user()->id;
 
         $obj->save();
 
@@ -112,16 +109,9 @@ abstract class BaseRepository
     *
     *
     */
-    public function update($id, $request)
+    public function update($obj)
     {
-        $obj = call_user_func(array($this->modelClass, "find"), $id);
-
-        $obj->fill($request->toArray());
-
-        if (!$obj)
-            throw new Exception($this->modelClass + " id (" + $id + ") não encontrado");
-
-        $obj->updated_by = Auth::user()->id;
+        //$obj->updated_by = Auth::user()->id;
 
         $obj->save();
 

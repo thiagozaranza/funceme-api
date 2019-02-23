@@ -61,23 +61,22 @@ class RestHttpRequest extends Request
 
         $query_params = request()->toArray();
 
-        if ($this->id) {
+        if ($this->id)
             $filters['id'] = $this->id; 
-        } else {
-            foreach ($query_params as $key => $value) {
 
-                $key = strtolower($key);
-    
-                if (!in_array($key, $this->reserved_words)) {
-    
-                    if (strpos($value, ',')) {
-                        $values = explode(',', $value);
-                        sort($values);
-                        $value = implode(',', $values);
-                    }
-                
-                    $filters[$key] = $value;
+        foreach ($query_params as $key => $value) {
+
+            $key = strtolower($key);
+
+            if (!in_array($key, $this->reserved_words)) {
+
+                if (strpos($value, ',')) {
+                    $values = explode(',', $value);
+                    sort($values);
+                    $value = implode(',', $values);
                 }
+            
+                $filters[$key] = $value;
             }
         }
 

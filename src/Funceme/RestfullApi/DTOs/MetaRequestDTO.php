@@ -102,6 +102,11 @@ class MetaRequestDTO
         return $this;
     }
 
+    public function getFilters()
+    {
+        return $this->query_params->getFilterList();
+    }
+
     public function with(array $with_list): MetaRequestDTO
     {
         $this->query_params->setWithList($with_list);

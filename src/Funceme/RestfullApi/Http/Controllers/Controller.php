@@ -123,16 +123,20 @@ class Controller extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws Exception
      */
-    public function store()
+    public function store(RestHttpRequest $request)
     {
         try {
-            $obj = $this->repository->store(request());
+            $meta_request = $request->parse($this, __FUNCTION__);
 
-            return response()->json(array('success' => true, 'model' => $obj->toArray()), 201);
+            $response = $this->service
+                ->setMetaRequest($meta_request)
+                ->store();
+
+            return response()->json(array('model' => $response->toArray()), 201);
         } catch (Exception $e) {
-            return response()->json(array('success' => false, 'message' => $e->getMessage()), 417);
+            return response()->json(array('message' => $e->getMessage()), 417);
         } catch (QueryException $qe) {
-            return response()->json(array('success' => false, 'message' => $qe->getMessage()), 417);
+            return response()->json(array('message' => $qe->getMessage()), 417);
         }
     }
 
@@ -142,15 +146,20 @@ class Controller extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws Exception
      */
-    public function update($id)
+    public function update($id, RestHttpRequest $request)
     {
         try {
-            $obj = $this->repository->update($id, request());
+            $meta_request = $request->parse($this, __FUNCTION__, $id);
+
+            $response = $this->service
+                ->setMetaRequest($meta_request)
+                ->update();
+
         } catch (Exception $e) {
-            return response()->json(array('success' => false, 'message' => $e->getMessage()), 417);
+            return response()->json(array('message' => $e->getMessage(), 'trace' => $e->getTrace()), 417);
         }
 
-        return response()->json(array('success' => true, 'model' => $obj->toArray()), 200);
+        return response()->json(array('model' => $response->toArray()), 200);
     }
 
     /**

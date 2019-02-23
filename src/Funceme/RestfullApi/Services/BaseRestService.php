@@ -30,7 +30,7 @@ class BaseRestService
         $this->meta_request->setModel($this->repository->getModelClass());
     }
 
-    public function setMetaRequest($meta_request): BaseRestService
+    public function setMetaRequest(MetaRequestDTO $meta_request): BaseRestService
     {
         $this->meta_request = $meta_request;
         return $this;
@@ -103,12 +103,33 @@ class BaseRestService
         return $this->show();
     }
 
-    public function save($model)
+    public function store()
     {
-        if ($model->id)
-            $this->repository->update($model);
-        else
-            $this->repository->store($model);
+        $model_class = $this->meta_request->getModel();
+
+        if (!class_exists($model_class))
+            throw new Exception('Entidade ' . $model_class . ' não existe.');
+
+        $model = new $model_class;
+        $model->fill($this->meta_request->getFilters());
+
+        $this->repository->store($model);
+    
+        return $model;
+    }
+
+    public function update()
+    {
+        $model_class = $this->meta_request->getModel();
+
+        if (!class_exists($model_class))
+            throw new Exception('Entidade ' . $model_class . ' não existe.');
+
+        $filters = $this->meta_request->getFilters();
+
+        $model = $model_class::findOrFail($filters['id']);
+        $model->fill($filters);
+        $this->repository->update($model);
 
         return $model;
     }
