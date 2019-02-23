@@ -193,18 +193,24 @@ trait PaginationTrait
                     }
 
                     $_with = $eager_model_name . ':' . $primaryKey . ',' . implode(',', $_keys);  
+
                 } else {
                     
                     $name_key = '';
-                    if (array_key_exists('nome', $fliped_map_keys))
-                        $name_key =  ',' . $fliped_map_keys['nome'];
-                    else 
-                        $name_key =  ',nome';
 
-                    $_with = $eager_model_name . ':' . $primaryKey . $name_key;
+                    if (method_exists($main_model, $eager_model_name) && get_class($main_model->$eager_model_name()) == 'Illuminate\Database\Eloquent\Relations\HasMany') {
+                        $_with = $eager_model_name;
+                    } else {
+                        if (array_key_exists('nome', $fliped_map_keys))
+                            $name_key =  ',' . $fliped_map_keys['nome'];
+                        else 
+                            $name_key =  ',nome';
+
+                        $_with = $eager_model_name . ':' . $primaryKey . $name_key;
+                    }
                 }
             }
-
+ 
             $query->with($_with);
         }
     }
