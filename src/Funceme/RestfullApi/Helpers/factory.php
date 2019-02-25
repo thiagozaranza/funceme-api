@@ -121,7 +121,13 @@ if (!function_exists('getSchemaName')) {
     function getSchemaName($context) : string
     {
         $parts = explode('\\', get_class($context));
-        return (sizeof($parts) == 6)? $parts[sizeof($parts) - 2] . '\\' : '';
+        
+        if ($parts[2] == 'Controllers')
+            $schemma = (sizeof($parts) == 6)? $parts[sizeof($parts) - 2] . '\\' : '' ;
+        else     
+            $schemma = (sizeof($parts) == 5)? $parts[sizeof($parts) - 2] . '\\' : '' ;
+
+        return $schemma;
     }
 }
 

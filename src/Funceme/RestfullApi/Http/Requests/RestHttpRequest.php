@@ -140,7 +140,7 @@ class RestHttpRequest extends Request
         foreach ($cache_control_parts as $cache_control_item) {
             switch($cache_control_item) {
                 case 'no-cache':
-                    $cache_options->setUseCache(true);
+                    $cache_options->setUseCache(false);
                     break;
                 case 'no-store':
                     $cache_options->setNoStore(true);

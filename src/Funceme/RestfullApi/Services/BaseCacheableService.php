@@ -26,10 +26,10 @@ abstract class BaseCacheableService
     public $min_database_refresh_time = 60;       // default: 1 minute
 
     // Após o cache ficar com o tempo de criação maior que este valor, o cache será atualizado em background. (tempo em segundos)
-    public $default_update_time       = 60*60*6;  // default: 6 hours
+    public $default_update_time       = 60*60*1;  // default: 1 hours
 
     // Tempo de vida da informação cacheada. (tempo em segundos)
-    public $default_expiration_time   = 60*60*24; // default: 24 hours
+    public $default_expiration_time   = 60*60*3; // default: 24 hours
 
     // Objeto responsável por lidar diretamente com a lógica do cache. 
     protected $cache_service;
