@@ -2,7 +2,7 @@
 
 namespace Funceme\RestfullApi\Policies;
 
-use Funceme\Models\Auth\User;
+use App\Models\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 
 class BasePolicy
@@ -31,6 +31,30 @@ class BasePolicy
     public function show(User $user, Model $obj)
     {   
         if ($user->can('Read ' . $this->modelClass))
+            return true;
+
+        return false;
+    }
+
+    public function create(User $user, Model $obj)
+    {   
+        if ($user->can('Create ' . $this->modelClass))
+            return true;
+
+        return false;
+    }
+
+    public function update(User $user, Model $obj)
+    {   
+        if ($user->can('Update ' . $this->modelClass))
+            return true;
+
+        return false;
+    }
+
+    public function delete(User $user, Model $obj)
+    {   
+        if ($user->can('Delete ' . $this->modelClass))
             return true;
 
         return false;
