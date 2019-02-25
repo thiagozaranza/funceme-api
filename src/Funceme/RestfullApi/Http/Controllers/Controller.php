@@ -3,6 +3,7 @@
 namespace Funceme\RestfullApi\Http\Controllers;
 
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Auth\Access\AuthorizationException;

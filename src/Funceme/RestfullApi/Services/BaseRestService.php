@@ -105,13 +105,20 @@ class BaseRestService
 
     public function store()
     {
+
         $model_class = $this->meta_request->getModel();
 
         if (!class_exists($model_class))
             throw new Exception('Entidade ' . $model_class . ' não existe.');
 
         $model = new $model_class;
-        $model->fill($this->meta_request->getFilters());
+
+        foreach ($this->meta_request->getFilters() as $key=>$value) {
+            if (property_exists($model, 'maps') && array_key_exists($key, array_flip($model->maps)))
+                $key = array_flip($model->maps)[$key];
+
+            $model->$key = $value;
+        }
 
         $this->repository->store($model);
     
@@ -128,7 +135,14 @@ class BaseRestService
         $filters = $this->meta_request->getFilters();
 
         $model = $model_class::findOrFail($filters['id']);
-        $model->fill($filters);
+
+        foreach ($this->meta_request->getFilters() as $key=>$value) {
+            if (property_exists($model, 'maps') && array_key_exists($key, array_flip($model->maps)))
+                $key = array_flip($model->maps)[$key];
+
+            $model->$key = $value;
+        }
+
         $this->repository->update($model);
 
         return $model;
