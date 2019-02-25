@@ -48,8 +48,8 @@ class Controller extends BaseController
 
             $meta_request = $request->parse($this, __FUNCTION__);
             
-            if ($meta_request->isPersonalToken())
-                $this->authorize(__FUNCTION__, $this->model_class);
+            //if ($meta_request->isPersonalToken())
+            //    $this->authorize(__FUNCTION__, $this->model_class);
 
             $response = $this->service
                 ->setMetaRequest($meta_request)
@@ -90,8 +90,8 @@ class Controller extends BaseController
 
             $meta_request = $request->parse($this, __FUNCTION__, $id);
             
-            if ($meta_request->isPersonalToken())
-                $this->authorize(__FUNCTION__, $object);
+            //if ($meta_request->isPersonalToken())
+            //    $this->authorize(__FUNCTION__, $object);
 
             $response = $this->service
                 ->setMetaRequest($meta_request)
