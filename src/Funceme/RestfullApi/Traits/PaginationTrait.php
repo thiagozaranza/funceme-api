@@ -65,7 +65,7 @@ trait PaginationTrait
 
                     $_model = $_model->$filter_part()->getModel();
                     $_table = $_model->getTable();
-                    $_primaryKey = ($_model->primaryKey)? $_model->primaryKey : 'id'; 
+                    $_primaryKey = ($_model->primaryKey)? $_model->primaryKey : 'id';
 
                     $joins = $query->getQuery()->joins;
 
