@@ -4,6 +4,7 @@ namespace Funceme\RestfullApi\Services;
 use \Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 
 use Funceme\RestfullApi\Repositories\BaseRepository;
 use Funceme\RestfullApi\DTOs\CacheableObjectDTO;
@@ -23,13 +24,13 @@ use Funceme\RestfullApi\DTOs\MetaRequestDTO;
 abstract class BaseCacheableService
 {
     // Tempo mínimo para que uma requisição consulte o banco de dados mesmo solicitando que o cache seja ignorado. (tempo em segundos)
-    public $min_database_refresh_time = 60;       // default: 1 minute
+    public $min_database_refresh_time;
 
     // Após o cache ficar com o tempo de criação maior que este valor, o cache será atualizado em background. (tempo em segundos)
-    public $default_update_time       = 60*60*1;  // default: 1 hours
+    public $default_update_time;  
 
     // Tempo de vida da informação cacheada. (tempo em segundos)
-    public $default_expiration_time   = 60*60*3; // default: 24 hours
+    public $default_expiration_time; 
 
     // Objeto responsável por lidar diretamente com a lógica do cache. 
     protected $cache_service;
@@ -42,6 +43,10 @@ abstract class BaseCacheableService
 
     public function __construct()
     {
+        $this->min_database_refresh_time    = Config::get('cache.min_database_refresh_time');
+        $this->default_update_time          = Config::get('cache.default_expiration_time');
+        $this->default_expiration_time      = Config::get('cache.default_update_time');
+
         $this->cache_service = new CacheService($this);
     }
 
