@@ -47,7 +47,7 @@ class BaseRestService
     *
     * @return CacheableObjectDTO
     **/
-    public function get(): CacheableObjectDTO
+    public function get(): ?CacheableObjectDTO
     {
         $action = $this->getMetaRequest()->getAction();
 
@@ -153,8 +153,15 @@ class BaseRestService
         return $model;
     }
 
-    public function destroy($id)
+    public function destroy()
     {
-        $this->repository->destroy($model);
+        $filters = $this->meta_request->getFilters();
+        $id = $filters['id'];
+
+        $this->repository->destroy($id);
+
+        $model_class = $this->meta_request->getModel();
+
+        Cache::tags($model_class)->flush();
     }
 }

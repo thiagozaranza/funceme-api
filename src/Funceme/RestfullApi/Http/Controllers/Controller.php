@@ -169,10 +169,13 @@ class Controller extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws Exception
      */
-    public function destroy($id)
+    public function destroy($id, RestHttpRequest $request)
     {
         try {
-            $this->repository->destroy($id);
+            $object = $this->service
+                ->setMetaRequest($request->parse($this, __FUNCTION__, $id))
+                ->get();
+
         } catch (Exception $e) {
             return response()->json(array('success' => false, 'message' => $e->getMessage()), 417);
         }
