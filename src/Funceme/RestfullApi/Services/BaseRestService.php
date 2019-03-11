@@ -121,6 +121,8 @@ class BaseRestService
         }
 
         $this->repository->store($model);
+
+        Cache::tags($model_class)->flush();
     
         return $model;
     }
@@ -144,6 +146,8 @@ class BaseRestService
         }
 
         $this->repository->update($model);
+
+        Cache::tags($model_class)->flush();
 
         return $model;
     }
