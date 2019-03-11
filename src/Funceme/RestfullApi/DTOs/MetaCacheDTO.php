@@ -40,7 +40,7 @@ class MetaCacheDTO
         return $this;
     }
 
-    public function getExpiresIn(): int
+    public function getExpiresIn(): ?int
     {
         return $this->expires_in;
     }
@@ -51,7 +51,7 @@ class MetaCacheDTO
         return $this;
     }
 
-    public function getQueueIn(): int
+    public function getQueueIn(): ?int
     {
         return $this->queue_in;
     }

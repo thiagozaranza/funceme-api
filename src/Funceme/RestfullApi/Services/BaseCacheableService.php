@@ -111,7 +111,7 @@ abstract class BaseCacheableService
      * 
      * @return int
      */
-    public function getExpirationTime(): int
+    public function getExpirationTime(): ?int
     {
         $expiration_time = $this->default_expiration_time;
 
@@ -132,7 +132,7 @@ abstract class BaseCacheableService
      * 
      * @return int
      */
-    public function getUpdateTime(): int
+    public function getUpdateTime(): ?int
     {
         $update_time = $this->default_update_time;
 
