@@ -133,7 +133,7 @@ class Controller extends BaseController
                 ->setMetaRequest($meta_request)
                 ->store();
 
-            return response()->json(array('model' => $response->toArray()), 201);
+            return response()->json(array('data' => $response->toArray()), 201);
         } catch (Exception $e) {
             return response()->json(array('message' => $e->getMessage()), 417);
         } catch (QueryException $qe) {
@@ -160,7 +160,7 @@ class Controller extends BaseController
             return response()->json(array('message' => $e->getMessage(), 'trace' => $e->getTrace()), 417);
         }
 
-        return response()->json(array('model' => $response->toArray()), 200);
+        return response()->json(array('data' => $response->toArray()), 200);
     }
 
     /**
