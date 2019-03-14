@@ -106,7 +106,6 @@ class BaseRestService
 
     public function store()
     {
-
         $model_class = $this->meta_request->getModel();
 
         if (!class_exists($model_class))

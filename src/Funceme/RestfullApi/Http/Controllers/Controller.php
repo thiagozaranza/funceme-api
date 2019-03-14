@@ -49,8 +49,8 @@ class Controller extends BaseController
 
             $meta_request = $request->parse($this, __FUNCTION__);
             
-            //if ($meta_request->isPersonalToken())
-            //    $this->authorize(__FUNCTION__, $this->model_class);
+            if ($meta_request->isPersonalToken())
+                $this->authorize(__FUNCTION__, $this->model_class);
 
             $response = $this->service
                 ->setMetaRequest($meta_request)
@@ -91,8 +91,8 @@ class Controller extends BaseController
 
             $meta_request = $request->parse($this, __FUNCTION__, $id);
             
-            //if ($meta_request->isPersonalToken())
-            //    $this->authorize(__FUNCTION__, $object);
+            if ($meta_request->isPersonalToken())
+                $this->authorize(__FUNCTION__, $object);
 
             $response = $this->service
                 ->setMetaRequest($meta_request)
@@ -129,6 +129,9 @@ class Controller extends BaseController
         try {
             $meta_request = $request->parse($this, __FUNCTION__);
 
+            if ($meta_request->isPersonalToken())
+                $this->authorize(__FUNCTION__);
+
             $response = $this->service
                 ->setMetaRequest($meta_request)
                 ->store();
@@ -150,7 +153,12 @@ class Controller extends BaseController
     public function update($id, RestHttpRequest $request)
     {
         try {
+            $object = call_user_func($this->model_class .'::findOrFail', $id);
+
             $meta_request = $request->parse($this, __FUNCTION__, $id);
+
+            if ($meta_request->isPersonalToken())
+                $this->authorize(__FUNCTION__, $object);
 
             $response = $this->service
                 ->setMetaRequest($meta_request)
@@ -172,7 +180,12 @@ class Controller extends BaseController
     public function destroy($id, RestHttpRequest $request)
     {
         try {
-            $object = $this->service
+            $object = call_user_func($this->model_class .'::findOrFail', $id);
+
+            if ($meta_request->isPersonalToken())
+                $this->authorize(__FUNCTION__, $object);
+
+            $this->service
                 ->setMetaRequest($request->parse($this, __FUNCTION__, $id))
                 ->get();
 
