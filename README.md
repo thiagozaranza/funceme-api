@@ -43,5 +43,6 @@
 
 - Configure permissions on file app/config/permission.php
     - Declare permissions on respectives roles
+    - Run "php artisan roles:sync" command
 
     
