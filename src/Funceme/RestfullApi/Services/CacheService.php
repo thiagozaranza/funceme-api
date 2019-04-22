@@ -20,6 +20,10 @@ class CacheService
 
     private $cache_service;
 
+    const BUILDING_FLAG = 'BUILDING';
+    const WAIT_BUILDING = 3;
+    const BUILDING_TIMEOUT = 60;
+
     public function __construct($cacheable_service)
     {
         $this->cacheable_service  = $cacheable_service;
@@ -36,9 +40,8 @@ class CacheService
 
         $this->cached_object = $this->getCachedObject();
 
-        if ($this->cached_object == 'BUILDING') {
-            Log::debug('BUILDING ' . $this->cacheable_service->hash());
-            sleep(5);
+        if ($this->cached_object == self::BUILDING_FLAG) {
+            sleep(self::WAIT_BUILDING);
             return $this->get();
         }
 
@@ -75,15 +78,19 @@ class CacheService
         $cache_tags = array_merge([env('APP_NAME')], $this->cacheable_service->getCacheTags());
 
         if (Cache::tags($cache_tags)->has($hash)) {
-            $cached_object = unserialize(Cache::tags($cache_tags)->get($hash), ['allowed_classes' => true]);
+
+            $obj = Cache::tags($cache_tags)->get($hash);
+
+            if ($obj == self::BUILDING_FLAG)
+                return $obj;
+
+            $cached_object = unserialize($obj, ['allowed_classes' => true]);
 
             $age = Carbon::now()->diffInSeconds($cached_object->getMetaCache()->getCachedAt());
 
             $cached_object->getMetaCache()->setExpiresIn($this->cacheable_service->default_expiration_time - $age);
             $cached_object->getMetaCache()->setQueueIn($this->cacheable_service->default_update_time - $age);
             $cached_object->getMetaCache()->setFromCache(true);
-
-            Log::info('- [cache] [' . $this->cacheable_service->hash() . '] ' . get_class($this->cacheable_service) . '->getCachedObject()');
 
             Redis::connection()->client()->quit();
         }
@@ -109,6 +116,14 @@ class CacheService
         return ($age < $life_in_seconds)? true : false;
     }
 
+    private function flagAsBuilding()
+    {
+        $cache_tags = array_merge([env('APP_NAME')], $this->cacheable_service->getCacheTags());
+        $hash = $this->cacheable_service->hash();
+
+        Cache::tags($cache_tags)->put($hash, self::BUILDING_FLAG, Carbon::now()->addSeconds(self::BUILDING_TIMEOUT));
+    }
+
     public function getFromDatabase($ignore_cache = false): CacheableObjectDTO
     {
         if (!$ignore_cache && ($this->cacheable_service->getMetaRequest()->getCacheOptions()->getOnlyIfCached()
@@ -117,7 +132,7 @@ class CacheService
             return $this->cached_object;
         }
 
-        Cache::put($this->cacheable_service->hash(), 'BUILDING', Carbon::now()->addSeconds(60));
+        $this->flagAsBuilding();
 
         $meta_cache = (new MetaCacheDTO)
             ->setExpiresIn($this->cacheable_service->getExpirationTime())
@@ -128,8 +143,6 @@ class CacheService
             ->setMetaRequest($this->cacheable_service->getMetaRequest())
             ->setMetaCache($meta_cache)
             ->setData($this->cacheable_service->doQuery());
-
-        Log::info('* [cache] [' . $this->cacheable_service->hash() . '] ' . get_class($this->cacheable_service) . '->doQuery()');    
 
         if (!$this->cacheable_service->getMetaRequest()->getCacheOptions()->getNoStore()) {
             $this->updateCache($object);
@@ -158,5 +171,8 @@ class CacheService
 
         Cache::tags($cache_tags)
             ->put($hash, serialize($object), Carbon::now()->addSeconds($expiration_time));
+
+        Redis::connection()->client()->pipeline()->getClient()->disconnect();
+        Redis::connection()->client()->disconnect();
     }
 }
