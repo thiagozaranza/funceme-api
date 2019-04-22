@@ -36,6 +36,12 @@ class CacheService
 
         $this->cached_object = $this->getCachedObject();
 
+        if ($this->cached_object == 'BUILDING') {
+            Log::debug('BUILDING ' . $this->cacheable_service->hash());
+            sleep(5);
+            return $this->get();
+        }
+
         if ($this->cached_object && $this->cacheable_service->getMetaRequest()->getCacheOptions()->getUseCache()) {
             $object = $this->cached_object;
 
@@ -111,6 +117,8 @@ class CacheService
             return $this->cached_object;
         }
 
+        Cache::put($this->cacheable_service->hash(), 'BUILDING', Carbon::now()->addSeconds(60));
+
         $meta_cache = (new MetaCacheDTO)
             ->setExpiresIn($this->cacheable_service->getExpirationTime())
             ->setQueueIn($this->cacheable_service->getUpdateTime())
@@ -150,8 +158,5 @@ class CacheService
 
         Cache::tags($cache_tags)
             ->put($hash, serialize($object), Carbon::now()->addSeconds($expiration_time));
-
-        Redis::connection()->client()->pipeline()->getClient()->disconnect();
-        Redis::connection()->client()->disconnect();
     }
 }
