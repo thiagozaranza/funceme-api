@@ -1,7 +1,7 @@
 
 # New resouce tutorial
 
-## 1. Model
+## 1. Model*
 
 - Create file app\\Models\\<Schemma ?>\\<Resource>.php
     - Extends Illuminate\Database\Eloquent\Model
