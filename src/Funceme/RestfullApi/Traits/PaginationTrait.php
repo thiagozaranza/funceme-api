@@ -201,9 +201,11 @@ trait PaginationTrait
                     if (property_exists($eager_model, 'maps') || (method_exists($main_model, $eager_model_name) && get_class($main_model->$eager_model_name()) == 'Illuminate\Database\Eloquent\Relations\HasMany')) {
                         $_with = $eager_model_name;
                     } else {
-                        if (array_key_exists('nome', $fliped_map_keys))
+                        if (array_key_exists('nome', $fliped_map_keys)) 
                             $name_key =  ',' . $fliped_map_keys['nome'];
-                        else 
+                        else if (property_exists($main_model, 'nameKey'))
+                            $name_key = ','.$main_model->nameKey;
+                        else
                             $name_key =  ',nome';
 
                         $_with = $eager_model_name . ':' . $primaryKey . $name_key;
