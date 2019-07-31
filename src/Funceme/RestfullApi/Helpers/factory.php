@@ -122,7 +122,7 @@ if (!function_exists('getSchemaName')) {
     {
         $parts = explode('\\', get_class($context));
         
-        $schemma = $parts[sizeof($parts) - 2];
+        $schemma = $parts[sizeof($parts) - 2] . '\\';
 
         return $schemma;
     }
