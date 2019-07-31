@@ -122,10 +122,7 @@ if (!function_exists('getSchemaName')) {
     {
         $parts = explode('\\', get_class($context));
         
-        if ($parts[2] == 'Controllers')
-            $schemma = (sizeof($parts) == 6)? $parts[sizeof($parts) - 2] . '\\' : '' ;
-        else     
-            $schemma = (sizeof($parts) == 5)? $parts[sizeof($parts) - 2] . '\\' : '' ;
+        $schemma = $parts[sizeof($parts) - 2];
 
         return $schemma;
     }
