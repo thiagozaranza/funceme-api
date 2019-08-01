@@ -15,7 +15,7 @@ class RestHttpRequest extends Request
 {
     public $request;
 
-    protected $reserved_words = ['q','cache', 'with', 'orderby', 'page', 'fetch', 'limit', 'oauth_client_id', 'oauth_user_id'];
+    protected $reserved_words = ['q','cache', 'with', 'orderby', 'page', 'fetch', 'limit', 'oauth_client_id', 'oauth_user_id', '_method'];
     protected $controller;
     protected $id;
  

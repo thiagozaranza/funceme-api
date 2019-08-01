@@ -35,7 +35,7 @@ class BasePolicy
         return false;
     }
 
-    public function create($user, Model $obj)
+    public function store($user)
     {   
         if ($user->can('Create ' . $this->modelClass))
             return true;
@@ -51,7 +51,7 @@ class BasePolicy
         return false;
     }
 
-    public function delete($user, Model $obj)
+    public function destroy($user, Model $obj)
     {   
         if ($user->can('Delete ' . $this->modelClass))
             return true;

@@ -139,9 +139,9 @@ class BaseRestService
         $model = $model_class::findOrFail($filters['id']);
 
         foreach ($this->meta_request->getFilters() as $key=>$value) {
-            if (property_exists($model, 'maps') && array_key_exists($key, array_flip($model->maps)))
+            if (property_exists($model, 'maps') && array_key_exists($key, array_flip($model->maps))) 
                 $key = array_flip($model->maps)[$key];
-
+            
             $model->$key = $value;
         }
 

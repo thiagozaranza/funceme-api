@@ -88,7 +88,7 @@ abstract class BaseRepository
     public function store($obj)
     {
         //$obj->created_by = Auth::user()->id;
-
+        
         $obj->save();
 
         foreach (get_class_methods($obj) as $_method) {
@@ -117,7 +117,7 @@ abstract class BaseRepository
 
         foreach (get_class_methods($obj) as $_method) {
 
-            if ($_method == '__construct')
+            if ($_method == '__construct' || !is_object($obj->$_method()))
                 break;
 
             $_class = get_class($obj->$_method());
