@@ -4,13 +4,13 @@ namespace Funceme\RestfullApi\Http\Controllers;
 
 use Exception;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Funceme\RestfullApi\Http\Requests\RestHttpRequest;
@@ -22,7 +22,6 @@ class Controller extends BaseController
 
     protected $service;
     protected $model_class;
-    private $status_code = 200;
 
     public function __construct()
     {
@@ -199,8 +198,14 @@ class Controller extends BaseController
     public function call_rpc(RestHttpRequest $request)
     {
         try {
+
+            $meta_request = $request->parse($this, __FUNCTION__);
+
+            if ($meta_request->isPersonalToken() && !Auth::user()->can("Run " . get_class($this->service))) 
+                throw new AuthorizationException('This action is unauthorized.');
+
             $object = $this->service
-                ->setMetaRequest($request->parse($this, __FUNCTION__))
+                ->setMetaRequest($meta_request)
                 ->get();
 
             return response()->json($object->toArray(), 200);
