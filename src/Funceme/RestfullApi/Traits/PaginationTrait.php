@@ -92,18 +92,27 @@ trait PaginationTrait
                         $_field = $_primaryKey;
                     }
 
-                } elseif ($_type == 'Illuminate\Database\Eloquent\Relations\BelongsToMany') {
+                } elseif ($relation_type == 'Illuminate\Database\Eloquent\Relations\BelongsToMany') {
 
                     $_pivotTable = $_model->$_field()->wherePivot($_field)->getTable();
-                    $_pivotForeignKeyName = $_model->$_field()->getQualifiedForeignKeyName();
-                    $_pivotRelatedKeyName = $_model->$_field()->getQualifiedRelatedKeyName();
 
-                    $query->join($_pivotTable, $_pivotForeignKeyName, '=', $_table . '.id');
+                    $_pivotForeignKeyName = $_model->$_field()->getQualifiedForeignPivotKeyName();
+                    $_pivotRelatedKeyName = $_model->$_field()->getQualifiedRelatedPivotKeyName();
 
                     $__model = $_model->$_field()->getModel();
                     $__table = $__model->getTable();
 
-                    $query->join($__table, $_pivotRelatedKeyName, '=', $__table . '.id');
+                    $_primaryKey = ($_model->primaryKey)? $_model->primaryKey : 'id';
+                    $__primaryKey = ($__model->primaryKey)? $__model->primaryKey : 'id';
+
+                    //dd('_pivotTable=' . $_pivotTable . '  _pivotForeignKeyName=' .$_pivotForeignKeyName . '  _pivotRelatedKeyName=' . $_pivotRelatedKeyName. ' _table=' . $_table . ' __table=' . $__table . ' _primaryKey=' . $_primaryKey . ' __primaryKey=' . $__primaryKey);
+
+                    $query->join($_pivotTable, $_pivotForeignKeyName, '=', $_table . '.' . $_primaryKey);
+
+                    $query->join($__table, $_pivotRelatedKeyName, '=', $__table . '.' . $__primaryKey);
+
+                    $_field = $__primaryKey;
+                    $_table = $__table;
                 }
             }
 
