@@ -40,10 +40,10 @@ class CacheService
 
         $this->cached_object = $this->getCachedObject();
 
-        if ($this->cached_object == self::BUILDING_FLAG) {
-            sleep(self::WAIT_BUILDING);
-            return $this->get();
-        }
+        // if ($this->cached_object == self::BUILDING_FLAG) {
+        //     sleep(self::WAIT_BUILDING);
+        //     return $this->get();
+        // }
 
         if ($this->cached_object && $this->cacheable_service->getMetaRequest()->getCacheOptions()->getUseCache()) {
             $object = $this->cached_object;
@@ -81,8 +81,8 @@ class CacheService
 
             $obj = Cache::tags($cache_tags)->get($hash);
 
-            if ($obj == self::BUILDING_FLAG)
-                return $obj;
+            // if ($obj == self::BUILDING_FLAG)
+            //     return $obj;
 
             $cached_object = unserialize($obj, ['allowed_classes' => true]);
 
@@ -132,7 +132,7 @@ class CacheService
             return $this->cached_object;
         }
 
-        $this->flagAsBuilding();
+        // $this->flagAsBuilding();
 
         $meta_cache = (new MetaCacheDTO)
             ->setExpiresIn($this->cacheable_service->getExpirationTime())
