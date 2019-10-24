@@ -28,7 +28,7 @@ trait PaginationTrait
                 $key_parts = explode('-',$filter_key);
                 $op = array_pop($key_parts);
             }
-            //operador não existe o objeto com relacionamento escola-nome=1
+            // operador não existe o objeto com relacionamento escola-nome=1
             else if (str_contains($filter_key, '-')) {
                 $key_parts = explode('-',$filter_key);
             }
@@ -105,8 +105,6 @@ trait PaginationTrait
                     $_primaryKey = ($_model->primaryKey)? $_model->primaryKey : 'id';
                     $__primaryKey = ($__model->primaryKey)? $__model->primaryKey : 'id';
 
-                    //dd('_pivotTable=' . $_pivotTable . '  _pivotForeignKeyName=' .$_pivotForeignKeyName . '  _pivotRelatedKeyName=' . $_pivotRelatedKeyName. ' _table=' . $_table . ' __table=' . $__table . ' _primaryKey=' . $_primaryKey . ' __primaryKey=' . $__primaryKey);
-
                     $query->join($_pivotTable, $_pivotForeignKeyName, '=', $_table . '.' . $_primaryKey);
 
                     $query->join($__table, $_pivotRelatedKeyName, '=', $__table . '.' . $__primaryKey);
@@ -142,10 +140,19 @@ trait PaginationTrait
                     $query->where($_table . '.' . $_field, '<=', $filter_value);
                     break;
                 case 'or':
-                    foreach (explode(',', $value) as $filter_value) {
-                        $query->orWhere($_table . '.' . $_field, '=', $filter_value);
+                    $valueParts = explode(',', $filter_value);
+
+                    if (sizeof($valueParts) == 1) {
+                        $query->where($_table . '.' . $_field, '=', $filter_value);
+                    } else if (sizeof($valueParts) > 1) {
+                        $query->where(function ($query) use ($_table ,$_field, $valueParts) {
+                            $firstPart = array_pop($valueParts);
+                            $query->where($_table . '.' . $_field, '=', $firstPart);
+                            while ($part = array_pop($valueParts)) {
+                                $query->orWhere($_table . '.' . $_field, '=', $part);
+                            }
+                        });
                     }
-                    $query->distinct($_table . '.id');
                     break;
             }
         }
