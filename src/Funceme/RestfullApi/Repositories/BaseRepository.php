@@ -45,37 +45,34 @@ abstract class BaseRepository
     {
         $obj = $this->findByID($id, true);
 
-        foreach (get_class_methods($obj) as $_method) {
+        $relations = [];
 
-            if ($_method == '__construct')
-                break;
+        $reflector = new \ReflectionClass($obj);
 
-            if (!is_object($obj->$_method()))
-                continue;
+        foreach ($reflector->getMethods() as $reflectionMethod) {
+            
+            $returnType = $reflectionMethod->getReturnType();
 
-            $_class = get_class($obj->$_method());
-
-            if (strpos($_class, 'HasMany') !== false || strpos($_class, 'BelongsToMany') !== false) {
-
-                $_obj = $obj->$_method()->get();
-
-                /*var_dump($_obj);
-                var_dump(get_class_methods($_obj)); exit;
-
-                if (method_exists($obj->$_method()->getModel(), 'getPostgisFields')) {
-                    var_dump($obj->$_method()->getModel()->getPostgisFields()); exit;
-                    foreach ($obj->$_method()->getModel()->getPostgisFields() as $postgis_field) {
-                        unset($_obj->$postgis_field);
-                    }
-                }*/
-                //var_dump($obj->$_method()->getModel()); exit;
-
-                $obj[$_method] = $_obj;
-            } else if (strpos($_class, 'BelongsTo') !== false) {
-                $_value = $obj->$_method()->get();
-                if (count($_value) > 0)
-                    $obj[$_method] = $_value[0];
+            if ($returnType) {
+                if (in_array(class_basename($returnType->getName()), ['HasOne', 'HasMany', 'BelongsTo', 'BelongsToMany', 'MorphToMany', 'MorphTo'])) {
+                    $relations[] = $reflectionMethod->name;
+                }
             }
+        }
+
+        foreach ($obj->relationships() as $relation=>$relationConfig) {
+            if (!in_array($relation, $relations))
+                $relations[] = $relation;
+        }
+
+        foreach ($relations as $relation) {
+            $relationList = $obj->$relation()->get();
+            $obj[$relation] = $relationList->map(
+                function ($a) { 
+                    unset($a["pivot"]);
+                    // TODO: Remover objetos poligonais. 
+                    return $a; 
+                });
         }
 
         return $obj;

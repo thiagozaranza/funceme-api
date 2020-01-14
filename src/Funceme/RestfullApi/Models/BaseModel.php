@@ -3,9 +3,12 @@
 namespace Funceme\RestfullApi\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Funceme\RestfullApi\Traits\RelationshipsTrait;
 
 class BaseModel extends Model
 {
+    use RelationshipsTrait;
+
     public function toArray()
     {
         $array_object = [];
