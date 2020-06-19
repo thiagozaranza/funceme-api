@@ -6,6 +6,7 @@ class MetaRequestDTO
 {
     private $URN;
     private $model;
+    private $download = false;
     private $action = 'index';
     private $query_params;
     private $cache_options;
@@ -141,6 +142,17 @@ class MetaRequestDTO
         return $this->oauth_info;
     }
 
+    public function setDownload($download): MetaRequestDTO
+    {
+        $this->download = $download;
+        return $this;
+    }
+
+    public function getDownload(): bool
+    {
+        return $this->download;
+    }
+
     public function isPersonalToken()
     {
         if ($this->oauth_info && $this->oauth_info->getUserId())
@@ -155,6 +167,7 @@ class MetaRequestDTO
             'URN'           => $this->URN,
             'model'         => $this->model,
             'action'        => $this->action,
+            'download'      => $this->download,
             'query_params'  => $this->query_params->toArray(),
             'cache_options' => $this->cache_options->toArray(),
             'oauth_info'    => ($this->oauth_info)? $this->oauth_info->toArray(): null

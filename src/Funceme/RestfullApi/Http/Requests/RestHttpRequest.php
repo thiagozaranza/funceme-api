@@ -15,7 +15,7 @@ class RestHttpRequest extends Request
 {
     public $request;
 
-    protected $reserved_words = ['q','cache', 'with', 'orderby', 'page', 'fetch', 'limit', 'oauth_client_id', 'oauth_user_id', '_method'];
+    protected $reserved_words = ['q','cache', 'with', 'orderby', 'page', 'fetch', 'limit', 'download', 'oauth_client_id', 'oauth_user_id', '_method'];
     protected $controller;
     protected $id;
  
@@ -28,16 +28,16 @@ class RestHttpRequest extends Request
 
         $meta_request = new MetaRequestDTO;
 
-        $urn = (method_exists($this->request, 'getPathInfo'))?
-            $this->request->getPathInfo() : $this->request->get('q');
-
-        $model = modelFactory($this->controller);
-
-        if ($model)
-            $meta_request->setModel(get_class($model));
-        
+        $urn = '';
+        if (method_exists($this->request, 'getPathInfo'))
+            $urn = $this->request->getPathInfo();
+        else     
+            $urn = $this->request->get('q');
+            
         $meta_request->setURN($urn);
-        $meta_request->setAction($action);        
+        $meta_request->setAction($action);
+        $meta_request->setDownload(array_key_exists('download', request()->toArray()));
+        $meta_request->setModel(get_class(modelFactory($this->controller)));
         $meta_request->setQueryParams($this->parseQueryParams());
         $meta_request->setCacheOptions($this->parseCacheOptions());
         $meta_request->setOAuthInfo($this->parseOAuthInfo());

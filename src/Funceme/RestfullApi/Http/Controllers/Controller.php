@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Funceme\RestfullApi\Http\Requests\RestHttpRequest;
 use Funceme\RestfullApi\DTOs\DataObjectDTO;
+use Funceme\RestfullApi\Utils\CSVExport;
 
 class Controller extends BaseController
 {
@@ -47,7 +48,7 @@ class Controller extends BaseController
         try {
 
             $meta_request = $request->parse($this, __FUNCTION__);
-            
+
             if ($meta_request->isPersonalToken())
                 $this->authorize(__FUNCTION__, $this->model_class);
 
@@ -56,7 +57,23 @@ class Controller extends BaseController
                 ->get()
                 ->toArray();
 
-            return response()->json($response, 200);
+            $parts = explode('\\', $meta_request->getModel());    
+
+            if ($meta_request->getDownload()) {  
+                
+                $parts = explode('\\', $meta_request->getModel()); 
+
+                header('Content-Type: application/csv');
+                header('Content-Disposition: attachment; filename='
+                    .array_pop($parts).'_'
+                    .substr($response['meta']['cache']['cached_at']->toISOString(), 0, 19) . '.csv');
+                header('Pragma: no-cache');    
+                
+
+                echo CSVExport::toCSV($response['data']['list']);
+
+            } else 
+                return response()->json($response, 200);
 
         } catch (AuthorizationException $e) {
             return response()->json(array('message' => $e->getMessage()), 401);
