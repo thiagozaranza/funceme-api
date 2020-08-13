@@ -3,7 +3,7 @@
     "description": "Api restfull com implementação de authentication, authorization e cache",
     "type": "library",
     "require": {
-        "spatie/laravel-permission": "^2.23",
+        "spatie/laravel-permission": "^3.13",
         "predis/predis": "^1.1"
     },
     "license": "MIT",
