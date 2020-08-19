@@ -79,7 +79,7 @@ trait PaginationTrait
                     }
 
                     if (!$isJoined)
-                        $query->join($_table, $filter_part_fk, '=', $_table . '.' . $_primaryKey);
+                        $query->join($_table, $main_table . '.' . $filter_part_fk, '=', $_table . '.' . $_primaryKey);
 
                     if (sizeof($key_parts) == 1) {
                         if (property_exists($_model, 'maps') && array_key_exists($key_parts[0], array_flip($_model->maps))) {
