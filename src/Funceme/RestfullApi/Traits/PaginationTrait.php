@@ -23,8 +23,11 @@ trait PaginationTrait
 
             $filter_key = strtolower($filter_key);
 
+            $_key_parts = explode('-',$filter_key);
+            $_last_part = $_key_parts[sizeof($_key_parts)-1];
+
             // operador existe: nome-eq=1
-            if (str_contains($filter_key, $this->operators)) {
+            if (sizeof($_key_parts) >= 2 && in_array($_last_part, $this->operators)) {
                 $key_parts = explode('-',$filter_key);
                 $op = array_pop($key_parts);
             }
