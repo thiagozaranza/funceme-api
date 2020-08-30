@@ -208,7 +208,7 @@ trait PaginationTrait
                                 $_keys[] = $name_key;
                         }
                     } else {
-                        $_keys[] = 'nome';
+                        $_keys[] = (property_exists($main_model, 'nameKey'))? $main_model->nameKey : 'nome';
                     }
 
                     $_with = $eager_model_name . ':' . $primaryKey . ',' . implode(',', $_keys);  
