@@ -120,6 +120,11 @@ class BaseRestService
             $model->$key = $value;
         }
 
+        if ($model->primaryKey)
+            unset($model->primaryKey);
+        else 
+            unset($model->id);
+
         $this->repository->store($model);
 
         Cache::tags($model_class)->flush();
