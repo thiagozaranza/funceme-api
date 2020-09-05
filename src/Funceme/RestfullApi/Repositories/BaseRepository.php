@@ -73,6 +73,9 @@ abstract class BaseRepository
                     // TODO: Remover objetos poligonais. 
                     return $a; 
                 });
+
+            if (class_basename($obj->$relation()) == 'BelongsTo' && sizeof($obj[$relation]) == 1)
+                $obj[$relation] = $obj[$relation][0];
         }
 
         return $obj;
