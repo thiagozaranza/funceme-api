@@ -128,8 +128,6 @@ abstract class BaseRepository
 
                 if (!is_null(Input::get($_method)))
                     $obj->$_method()->sync(explode(',', Input::get($_method)));
-                else
-                    $obj->$_method()->sync([]);
             }
         }
 
