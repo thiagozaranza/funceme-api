@@ -11,7 +11,7 @@ use Funceme\RestfullApi\DTOs\QueryParamsDTO;
 
 trait PaginationTrait
 {
-    private $operators = ['-eq', '-neq', '-lk', '-gt', '-gte', '-lt', '-lte', '-or', 'oauth_client_id', 'oauth_user_id'];
+    private $operators = ['eq', 'neq', 'lk', 'gt', 'gte', 'lt', 'lte', 'or', 'oauth_client_id', 'oauth_user_id'];
 
     private function buildQuery(&$query, QueryParamsDTO $paginator)
     { 
