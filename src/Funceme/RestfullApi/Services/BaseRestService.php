@@ -5,11 +5,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model;
 
 use Funceme\RestfullApi\DTOs\MetaRequestDTO;
 use Funceme\RestfullApi\DTOs\CacheableObjectDTO;
 use Funceme\RestfullApi\DTOs\PageDTO;
+use Funceme\RestfullApi\DTOs\CacheTimesDTO;
 
 class BaseRestService
 {
@@ -23,12 +25,20 @@ class BaseRestService
      */
     private $meta_request;
 
+    protected $cache_times;
+
     public function __construct() 
     {
         $this->repository = repositoryFactory($this);
         
         $this->meta_request = new MetaRequestDTO();
         $this->meta_request->setModel($this->repository->getModelClass());
+
+        $this->cache_times = (new CacheTimesDTO())
+            ->setDefaultUpdateTime(Config::get('cache.default_update_time'))
+            ->setDefaultExpirationTime(Config::get('cache.default_expiration_time'))
+            ->setMinDatabaseRefreshTime(Config::get('cache.min_database_refresh_time'));
+
     }
 
     public function setMetaRequest(MetaRequestDTO $meta_request): BaseRestService
@@ -64,14 +74,19 @@ class BaseRestService
     **/
     private function index(): CacheableObjectDTO
     {
+        if (method_exists($this, 'setCacheTimes'))
+            $this->setCacheTimes();
+
         $cached_list = (new PaginationListService)
             ->setRepository($this->repository)
             ->setMetaRequest($this->meta_request)
+            ->setCacheTimes($this->cache_times)
             ->get();
 
         $cached_total = (new PaginationTotalService)
             ->setRepository($this->repository)
             ->setMetaRequest($this->meta_request)
+            ->setCacheTimes($this->cache_times)
             ->get();
 
         $limit = $this->meta_request->getLimit();
@@ -92,9 +107,13 @@ class BaseRestService
 
     private function show(): CacheableObjectDTO
     {
+        if (method_exists($this, 'setCacheTimes'))
+            $this->setCacheTimes();
+
         return (new ObjectService)
             ->setRepository($this->repository)
             ->setMetaRequest($this->meta_request)
+            ->setCacheTimes($this->cache_times)
             ->get();
     }
 

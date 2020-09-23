@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Funceme\RestfullApi\Repositories\BaseRepository;
 use Funceme\RestfullApi\DTOs\CacheableObjectDTO;
 use Funceme\RestfullApi\DTOs\MetaRequestDTO;
+use Funceme\RestfullApi\DTOs\CacheTimesDTO;
 
 /**
  * BaseCacheableService
@@ -61,6 +62,15 @@ abstract class BaseCacheableService
         return $this;
     }
 
+    public function setCacheTimes(CacheTimesDTO $cache_times): BaseCacheableService
+    {
+        $this->min_database_refresh_time    = $cache_times->getMinDatabaseRefreshTime();
+        $this->default_update_time          = $cache_times->getDefaultUpdateTime();
+        $this->default_expiration_time      = $cache_times->getDefaultExpirationTime();
+
+        return $this;
+    }
+
     public function getMetaRequest(): MetaRequestDTO
     {
         if (!$this->meta_request)
@@ -87,12 +97,7 @@ abstract class BaseCacheableService
         return (array_key_exists($parameter_name, $filter_list))? $filter_list[$parameter_name] : null;
     }
 
-    public function setCacheTimes()
-    {
-        // Override if cache times can be changed.
-    }
-
-    /**
+   /**
      * Método principal da classe. Retorna o objeto solicitado, 
      * seja do cahce ou do banco de dados.
      *
@@ -100,8 +105,6 @@ abstract class BaseCacheableService
      */
     public function get(): CacheableObjectDTO
     {
-        $this->setCacheTimes();
-        
         return $this->cache_service->get();
     }
 
