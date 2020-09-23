@@ -88,8 +88,8 @@ class CacheService
 
             $age = Carbon::now()->diffInSeconds($cached_object->getMetaCache()->getCachedAt());
 
-            $cached_object->getMetaCache()->setExpiresIn($this->cacheable_service->default_expiration_time - $age);
-            $cached_object->getMetaCache()->setQueueIn($this->cacheable_service->default_update_time - $age);
+            $cached_object->getMetaCache()->setExpiresIn($this->cacheable_service->cache_times->getExpirationTime() - $age);
+            $cached_object->getMetaCache()->setQueueIn($this->cacheable_service->cache_times->getUpdateTime() - $age);
             $cached_object->getMetaCache()->setFromCache(true);
 
             Redis::connection()->client()->quit();
@@ -128,15 +128,15 @@ class CacheService
     {
         if (!$ignore_cache && ($this->cacheable_service->getMetaRequest()->getCacheOptions()->getOnlyIfCached()
             || ($this->cached_object
-                && $this->cacheIsNewerThan($this->cacheable_service->min_database_refresh_time)))) {
+                && $this->cacheIsNewerThan($this->cacheable_service->cache_times->getMinDatabaseRefreshTime())))) {
             return $this->cached_object;
         }
 
         // $this->flagAsBuilding();
 
         $meta_cache = (new MetaCacheDTO)
-            ->setExpiresIn($this->cacheable_service->getExpirationTime())
-            ->setQueueIn($this->cacheable_service->getUpdateTime())
+            ->setExpiresIn($this->cacheable_service->cache_times->getExpirationTime())
+            ->setQueueIn($this->cacheable_service->cache_times->getUpdateTime())
             ->setFromCache(false);
 
         $object = (new CacheableObjectDTO)
@@ -155,7 +155,7 @@ class CacheService
     {
         $age = Carbon::now()->diffInSeconds($object->getMetaCache()->getCachedAt());
 
-        return ($age >= $this->cacheable_service->getUpdateTime() && !$object->getMetaCache()->hasQueuedAt());
+        return ($age >= $this->cacheable_service->cache_times->getUpdateTime() && !$object->getMetaCache()->hasQueuedAt());
     }
 
     public function updateCache(CacheableObjectDTO $object)
@@ -163,7 +163,7 @@ class CacheService
         /*if (!Redis::connection()->client()->isConnected())
             return null;*/
 
-        $expiration_time = $this->cacheable_service->getExpirationTime();
+        $expiration_time = $this->cacheable_service->cache_times->getExpirationTime();
         $cache_tags = array_merge([env('APP_NAME')], $this->cacheable_service->getCacheTags());
         $hash = $this->cacheable_service->hash();
 

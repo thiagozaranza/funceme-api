@@ -24,15 +24,6 @@ use Funceme\RestfullApi\DTOs\CacheTimesDTO;
 
 abstract class BaseCacheableService
 {
-    // Tempo mínimo para que uma requisição consulte o banco de dados mesmo solicitando que o cache seja ignorado. (tempo em segundos)
-    public $min_database_refresh_time;
-
-    // Após o cache ficar com o tempo de criação maior que este valor, o cache será atualizado em background. (tempo em segundos)
-    public $default_update_time;  
-
-    // Tempo de vida da informação cacheada. (tempo em segundos)
-    public $default_expiration_time; 
-
     // Objeto responsável por lidar diretamente com a lógica do cache. 
     protected $cache_service;
 
@@ -42,12 +33,11 @@ abstract class BaseCacheableService
     // Objeto com acesso ao banco de dados que fará a consulta, caso necessária.
     protected $repository;
 
+    public $cache_times;
+
     public function __construct()
     {
-        $this->min_database_refresh_time    = Config::get('cache.min_database_refresh_time');
-        $this->default_update_time          = Config::get('cache.default_expiration_time');
-        $this->default_expiration_time      = Config::get('cache.default_update_time');
-
+        $this->cache_times = new CacheTimesDTO();
         $this->cache_service = new CacheService($this);
     }
 
@@ -62,12 +52,21 @@ abstract class BaseCacheableService
         return $this;
     }
 
-    public function setCacheTimes(CacheTimesDTO $cache_times): BaseCacheableService
+    public function modifyCacheTimes(CacheTimesDTO $cache_times): BaseCacheableService
     {
-        $this->min_database_refresh_time    = $cache_times->getMinDatabaseRefreshTime();
-        $this->default_update_time          = $cache_times->getDefaultUpdateTime();
-        $this->default_expiration_time      = $cache_times->getDefaultExpirationTime();
+        $this->cache_times = $cache_times;
+        return $this;
+    }
 
+    public function setExpirationTime(int $seconds): BaseCacheableService
+    {
+        $this->cache_times->setExpirationTime($seconds);
+        return $this;
+    }
+
+    public function setUpdateTime(int $seconds): BaseCacheableService
+    {
+        $this->cache_times->setUpdateTime($seconds);
         return $this;
     }
 
@@ -105,49 +104,10 @@ abstract class BaseCacheableService
      */
     public function get(): CacheableObjectDTO
     {
+        if (method_exists($this, 'setCacheTimes'))
+            $this->setCacheTimes();
+            
         return $this->cache_service->get();
-    }
-
-    /**
-     * Verifica se o Model do objeto da solicitação tem sua própria configuração 
-     * de tempo de expiração ou retorna o valor default definido nesta classe.
-     * 
-     * @return int
-     */
-    public function getExpirationTime(): ?int
-    {
-        $expiration_time = $this->default_expiration_time;
-
-        $model_class = $this->getMetaRequest()->getModel();
-        
-        if ($model_class) {
-            $model = new $model_class;
-            if (property_exists($model, 'expirationTime'))
-                $expiration_time = $model::expirationTime;
-        }
-
-        return $expiration_time;
-    }
-
-    /**
-     * Verifica se o Model do objeto da solicitação tem sua própria configuração 
-     * de tempo de update ou retorna o valor default definido nesta classe.
-     * 
-     * @return int
-     */
-    public function getUpdateTime(): ?int
-    {
-        $update_time = $this->default_update_time;
-
-        $model_class = $this->getMetaRequest()->getModel();
-
-        if ($model_class) {
-            $model = new $model_class;
-            if (property_exists($model, 'updateTime'))
-                $expiration_time = $model::updateTime;
-        }
-
-        return $update_time;
     }
 
     /**

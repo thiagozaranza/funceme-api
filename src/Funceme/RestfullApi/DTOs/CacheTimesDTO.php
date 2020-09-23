@@ -2,11 +2,20 @@
 
 namespace Funceme\RestfullApi\DTOs;
 
+use Illuminate\Support\Facades\Config;
+
 class CacheTimesDTO
 {
     private $min_database_refresh_time;
-    private $default_update_time;
-    private $default_expiration_time;
+    private $update_time;
+    private $expiration_time;
+
+    public function __construct()
+    {
+        $this->min_database_refresh_time    = Config::get('cache.min_database_refresh_time');
+        $this->update_time          = Config::get('cache.default_update_time');
+        $this->expiration_time      = Config::get('cache.default_expiration_time');
+    }
 
     public function setMinDatabaseRefreshTime(int $seconds): CacheTimesDTO
     {
@@ -19,34 +28,34 @@ class CacheTimesDTO
         return $this->min_database_refresh_time;
     }
 
-    public function setDefaultUpdateTime(int $seconds): CacheTimesDTO
+    public function setUpdateTime(int $seconds): CacheTimesDTO
     {
-        $this->default_update_time = $seconds;
+        $this->update_time = $seconds;
         return $this;
     }
 
-    public function getDefaultUpdateTime(): int
+    public function getUpdateTime(): int
     {
-        return $this->default_update_time;
+        return $this->update_time;
     }
 
-    public function setDefaultExpirationTime(int $seconds): CacheTimesDTO
+    public function setExpirationTime(int $seconds): CacheTimesDTO
     {
-        $this->default_expiration_time = $seconds;
+        $this->expiration_time = $seconds;
         return $this;
     }
 
-    public function getDefaultExpirationTime(): int
+    public function getExpirationTime(): int
     {
-        return $this->default_expiration_time;
+        return $this->expiration_time;
     }
 
     public function toArray()
     {
         return [
             'min_database_refresh_time' => $this->getMinDatabaseRefreshTime(),
-            'default_update_time'       => $this->getDefaultUpdateTime(),
-            'default_expiration_time'   => $this->getDefaultExpirationTime()
+            'update_time'       => $this->getUpdateTime(),
+            'expiration_time'   => $this->getExpirationTime()
         ];
     }
 }

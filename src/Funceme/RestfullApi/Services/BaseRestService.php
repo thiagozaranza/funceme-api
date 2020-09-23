@@ -34,11 +34,7 @@ class BaseRestService
         $this->meta_request = new MetaRequestDTO();
         $this->meta_request->setModel($this->repository->getModelClass());
 
-        $this->cache_times = (new CacheTimesDTO())
-            ->setDefaultUpdateTime(Config::get('cache.default_update_time'))
-            ->setDefaultExpirationTime(Config::get('cache.default_expiration_time'))
-            ->setMinDatabaseRefreshTime(Config::get('cache.min_database_refresh_time'));
-
+        $this->cache_times = new CacheTimesDTO();
     }
 
     public function setMetaRequest(MetaRequestDTO $meta_request): BaseRestService
@@ -50,6 +46,24 @@ class BaseRestService
     public function getMetaRequest(): MetaRequestDTO
     {
         return $this->meta_request;
+    }
+
+    public function modifyCacheTimes(CacheTimesDTO $cache_times): BaseRestService
+    {
+        $this->cache_times = $cache_times;
+        return $this;
+    }
+
+    public function setExpirationTime(int $seconds): BaseRestService
+    {
+        $this->cache_times->setExpirationTime($seconds);
+        return $this;
+    }
+
+    public function setUpdateTime(int $seconds): BaseRestService
+    {
+        $this->cache_times->setUpdateTime($seconds);
+        return $this;
     }
 
     /**
@@ -80,13 +94,13 @@ class BaseRestService
         $cached_list = (new PaginationListService)
             ->setRepository($this->repository)
             ->setMetaRequest($this->meta_request)
-            ->setCacheTimes($this->cache_times)
+            ->modifyCacheTimes($this->cache_times)
             ->get();
 
         $cached_total = (new PaginationTotalService)
             ->setRepository($this->repository)
             ->setMetaRequest($this->meta_request)
-            ->setCacheTimes($this->cache_times)
+            ->modifyCacheTimes($this->cache_times)
             ->get();
 
         $limit = $this->meta_request->getLimit();
@@ -113,7 +127,7 @@ class BaseRestService
         return (new ObjectService)
             ->setRepository($this->repository)
             ->setMetaRequest($this->meta_request)
-            ->setCacheTimes($this->cache_times)
+            ->modifyCacheTimes($this->cache_times)
             ->get();
     }
 
