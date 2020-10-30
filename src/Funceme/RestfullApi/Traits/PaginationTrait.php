@@ -11,7 +11,7 @@ use Funceme\RestfullApi\DTOs\QueryParamsDTO;
 
 trait PaginationTrait
 {
-    private $operators = ['eq', 'neq', 'lk', 'gt', 'gte', 'lt', 'lte', 'or', 'oauth_client_id', 'oauth_user_id'];
+    private $operators = ['eq', 'neq', 'lk', 'gt', 'gte', 'lt', 'lte', 'or', 'has' , 'oauth_client_id', 'oauth_user_id'];
 
     private function buildQuery(&$query, QueryParamsDTO $paginator)
     { 
@@ -143,6 +143,18 @@ trait PaginationTrait
                     break;
                 case 'lte':
                     $query->where($_table . '.' . $_field, '<=', $filter_value);
+                    break;
+                case 'has':
+                    $valueParts = explode(',', $filter_value);
+
+                    if (sizeof($valueParts) == 1) {
+                        $query->whereRaw($filter_value . ' =any (' . $_table . '.' . $_field .')');
+                    } else if (sizeof($valueParts) > 1) {
+                        $query->where(function ($query) use ($_table ,$_field, $valueParts) {
+                            $item = array_pop($valueParts);
+                            $query->whereRaw($item . ' =any (' . $_table . '.' . $_field .')');                           
+                        });
+                    }
                     break;
                 case 'or':
                     $valueParts = explode(',', $filter_value);
